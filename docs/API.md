@@ -98,6 +98,12 @@ export default {
 
 扩展路由处理，简单的返回扩展
 
+### RedirectMixin的依赖
+
+| 组件来源 | 组件名称 |
+|------|------|
+| 无   | 无   |
+
 ### RedirectMixin的使用
 
 ```html
