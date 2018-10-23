@@ -122,3 +122,139 @@ export default {
 ```
 
 调用`this.$$back(route?)`方法时，优先返回`$route.query.redirect`的路径；当没有`$route.query.redirect`参数时，按传入的路由跳转；传入的路由都没有时，则调用`$router.back()`跳转路由处理。
+
+## ConditionMixin
+
+条件筛选扩展，建议结合[FilterBar组件](../src/components/FilterBar.vue)一并使用。
+
+| 组件来源 | 组件名称 |
+|---------|---------|
+| 无       | 无       |
+
+### ConditionMixin的使用
+
+```html
+<template>
+    <FilterBar 
+        v-model="conditions.values"
+        :condition="conditions.attrs">
+        <iv-button
+            type="primary"
+            @click="changeQuery($$parseCondition(conditions.values))">
+            <iv-icon type="search" size="14" style="vertical-align:text-bottom" /> 查询
+        </iv-button>
+    </FilterBar>
+</template>
+<script>
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "start", type: Date, hidden: true },
+                { name: "end", type: Date, hidden: true },
+                { name: "daterange", type: "Daterange", subs: ['start','end'], placeholder: "反馈时间" },
+                { name: "status", hidden: true },
+                { name: "archive", type: Array, default: 'all', options: [{id:'1', name:'待处理'},{id:'2', name:'已处理'}], placeholder:"处理说明", clearable:true },
+                { name: "connect", type: String, title: '联系方式', default: '', hidden: true },
+                { name: "user_id", type: String, title: '用户id', default: '', hidden: true },
+                { name: "search", type: "Search", subs: ['user_id','connect'], search_by: 'user_id' }
+            ]
+        })
+    ]
+    mounted () {
+        this.$$updateCondition(this.$$serializeCondition({...this.$route.query,...this.$route.params}))
+        this.refresh(this.conditions.values)
+    },
+    beforeRouteUpdate(to, from, next){
+        this.$$updateCondition(this.$$serializeCondition({...to.query,...to.params}))
+        this.$nextTick(()=>this.refresh(this.conditions.values))
+        next();
+    },
+    methods: {
+        refresh(query){
+            ...
+        },
+        changeQuery(query, params=this.$route.params){
+            this.$router.push({
+                name: this.$route.name,
+                query: query,
+                params: params
+            });
+        }
+    }
+}
+</script>
+```
+
+### 设置说明
+
+| 字段名称        | 说明                                                                                                 |
+|-----------------|----------------------------------------------------------------------------------------------------|
+| name            | 字段名称                                                                                             |
+| type            | 类型，`FilterBar`将会根据此字段改变显示方式，目前支持：`Date`, `Daterange`, `String`, `Array`, `Search` |
+| subs            | 当类型是`Daterang`或`Search`时有效，内容为筛选项中名称集                                              |
+| hidden          | 是否显示该筛选项                                                                                     |
+| options         | 当类型是`Array`时有效，内容为筛选可选项                                                               |
+| search_by       | 当类型是`Search`是有效，内容为筛选项中某项的名称                                                      |
+| clearable       | 当类型是`Array`是有效，用于`iview-select`                                                             |
+| placeholder     | 用于显示输入提示                                                                                     |
+| style           | 用于设置筛选项样式                                                                                   |
+| search_by_style | 用于设置筛选项搜索的样式                                                                             |
+
+#### Daterange设置例子
+
+使用`iview-datapicker`时，时间段使用数组表示
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "daterange", type: "Daterange", placeholder: "反馈时间" },
+            ]
+        })
+    ]
+    ...
+}
+```
+
+由于部分接口设计需分拆成两个字段，以下配置能满足需要。
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "start", type: Date, hidden: true },
+                { name: "end", type: Date, hidden: true },
+                { name: "daterange", type: "Daterange", subs: ['start','end'], placeholder: "反馈时间" },
+            ]
+        })
+    ]
+    ...
+}
+```
+
+#### Search设置例子
+
+为满足多个字符串方式的筛选只能使用一个时的需求，可使用以下设置。
+
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "connect", type: String, title: '联系方式', default: '', hidden: true },
+                { name: "user_id", type: String, title: '用户id', default: '', hidden: true },
+                { name: "search", type: "Search", subs: ['user_id','connect'], search_by: 'user_id' }
+            ]
+        })
+    ]
+    ...
+}
+```
