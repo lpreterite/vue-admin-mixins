@@ -6,7 +6,7 @@ export default function (options) {
     const __defaults = (fields) => fields.reduce((result, fieldset) => {
         if (['Search'].indexOf(fieldset.type) > -1) return result
         const fieldName = fieldset.name
-        result[fieldName] = typeof fieldset.defult === 'undefined' ? typeof fieldset.type === 'function' ? fieldset.type() : "" : fieldset.defult
+        result[fieldName] = typeof fieldset.default === 'undefined' ? (typeof fieldset.type === 'function' ? fieldset.type() : "") : fieldset.default
         return result
     }, {})
 
@@ -21,8 +21,8 @@ export default function (options) {
         },
         methods: {
             $$updateCondition(query) {
-                console.log(query)
-                this.conditions.values = query
+                // console.log(this.conditions.values, query)
+                this.conditions.values = { ...this.conditions.values, ...query }
             },
             $$parseCondition(query) {
                 return Object.keys(query).reduce((result, fieldName) => {
@@ -56,8 +56,9 @@ export default function (options) {
                 }, {})
             },
             $$serializeCondition(query) {
-                return options.condition.reduce((result, fieldset) => {
+                const result = options.condition.reduce((result, fieldset) => {
                     const fieldName = fieldset.name
+                    if (typeof query[fieldName] === 'undefined') return result
                     switch (typeof fieldset.type === 'function' ? fieldset.type.name : fieldset.type) {
                         case 'Date':
                             result[fieldName] = Fecha.parse(query[fieldName], options.format)
@@ -81,6 +82,7 @@ export default function (options) {
                     }
                     return result
                 }, {})
+                return { ...query, result }
             }
         }
     }

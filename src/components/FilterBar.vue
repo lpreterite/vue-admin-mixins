@@ -8,7 +8,7 @@
             <iv-input
                 v-if="[Array,'Daterange','Date','Search'].indexOf(fieldset.type) == -1"
                 v-model="conditions.values[fieldset.name]"
-                :style="fieldset.style || {width: '120px'}">
+                :style="fieldset.style || {width: '200px'}">
                 <span slot="prepend">{{ fieldset.title || fieldset.name }}</span>
             </iv-input>
             <iv-input
