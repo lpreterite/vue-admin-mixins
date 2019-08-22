@@ -1,4 +1,5 @@
 export default function (stateName) {
+    if(typeof stateName === 'undefined') throw Error('The stateName is required in Status.mixin')
     return function (opts) {
         if (typeof opts === 'undefined') {
             opts = { defaults: function () { return false } };
@@ -10,7 +11,7 @@ export default function (stateName) {
                 if (typeof attr === 'string') {
                     opts[attr] = function () { return false };
                 } else {
-                    opts[attr.name] = attr.default;
+                    opts[attr.name] = function () { return attr.default };
                 }
             });
         }
