@@ -305,58 +305,20 @@ export default {
 ```
 以`$$active`为公用数据请求函数，并提供请求前、请求成功与请求失败的处理函数以供灵活使用
 
-#### $$onRequestBefore钩子
+#### 钩子
 
-| 名称 | 参数 | 说明 |
-|------|------|
-| `$$onRequestBefore` | `modelName`类名, `method`方法名, `ctx`上下文内容 | 请求前处理，必须返回`ctx`上下文 |
+| 名称 | 参数 | 说明 | `ctx`上下文包含 |
+|------|------|------|------|
+| `$$onRequestBefore` | `modelName`类名, `method`方法名, `ctx`上下文内容 | 请求前处理，必须返回`ctx`上下文 | query（请求参数）,options={origin}（请求源）|
+| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 | err（错误内容）|
+| `$$onRestfulSuccess` | `modelName`类名, `method`方法名, `result`请求返回的内容 | 请求成功后的处理 | result（请求成功返回的信息） |
 
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-|query|请求参数|
-|options={origin}|请求源|
-
-#### $$onRestfulError钩子
-
-| 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 |
-
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-|err| 错误内容 |
-
-#### $$onRestfulSuccess钩子
-
-| 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$onRestfulSuccess` | `modelName`类名, `method`方法名, `result`请求返回的内容 | 请求成功后的处理 |
-
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-|result|请求成功返回的信息|
-
-#### $$fetch方法
+#### 方法
 | 名称 | 参数 | 说明 |
 |-|-|-|
 | `$$fetch` | `MODEL_NAME`类名, `query`请求参数, `options`设置 | 请求数据列表 |
-
-#### $$find方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
 | `$$find` | `MODEL_NAME`类名, `id`请求对象ID, `options`设置 | 请求单个数据 |
-
-#### $$save方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
 | `$$save` | `MODEL_NAME`类名, `data`请求保存对象, `options`设置 | 请求保存对象 |
-
-#### $$del方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
 | `$$del` | `MODEL_NAME`类名, `id`请求对象ID, `options`设置 | 请求删除数据 |
 
 ## DirtyHandlerMixin
@@ -440,53 +402,21 @@ export default {
 }
 </script>
 ```
-#### $$onRestfulBefore钩子
+#### 钩子
 
+| 名称 | 参数 | 说明 | `ctx`上下文包含 |
+|-------------|-----------|-------------|--------------|
+| `$$onRestfulBefore` | `modelName`类名, `method`方法名 | 获得请求结果前的处理 | 无 |
+| `$$onRestfulSuccess` | `modelName`类名, `method`方法名 | 成功获得请求结果后的处理 | 无 |
+| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 | err（错误内容） |
+
+
+#### 方法
 | 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$onRestfulBefore` | `modelName`类名, `method`方法名 | 获得请求结果前的处理
-
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-| 无 | 无 |
-
-#### $$onRestfulSuccess钩子
-
-| 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$onRestfulSuccess` | `modelName`类名, `method`方法名 | 成功获得请求结果后的处理
-
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-| 无 | 无 |
-
-#### $$onRestfulError钩子
-
-| 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 |
-
-`ctx`上下文包含：
-| 名称 | 说明 |
-|-|-|
-|err| 错误内容 |
-
-#### $$refreshDetail方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
+|-------------|-----------|-------------|
 | `$$refreshDetail` |  `query`请求参数 | 刷新数据 |
-
-#### $$saveDetail方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
 | `$$saveDetail` |  `data`请求参数对象 | 进行表单验证并调用$$save方法 |
-
-#### $$destroyDetail方法
-| 名称 | 参数 | 说明 |
-|-|-|-|
-| `$$destroyDetail` | - | 进行删除确认并调用$$del方法 |
+| `$$destroyDetail` | 无 | 进行删除确认并调用$$del方法 |
 
 ## MessageMixin
 
