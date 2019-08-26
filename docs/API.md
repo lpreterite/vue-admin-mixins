@@ -186,6 +186,79 @@ export default {
 }
 </script>
 ```
+
+### 设置说明
+
+| 字段名称        | 说明                                                                                                 |
+|-----------------|----------------------------------------------------------------------------------------------------|
+| name            | 字段名称                                                                                             |
+| type            | 类型，`FilterBar`将会根据此字段改变显示方式，目前支持：`Date`, `Daterange`, `String`, `Array`, `Search` |
+| subs            | 当类型是`Daterang`或`Search`时有效，内容为筛选项中名称集                                              |
+| hidden          | 是否显示该筛选项                                                                                     |
+| options         | 当类型是`Array`时有效，内容为筛选可选项                                                               |
+| search_by       | 当类型是`Search`是有效，内容为筛选项中某项的名称                                                      |
+| clearable       | 当类型是`Array`是有效，用于`iview-select`                                                             |
+| placeholder     | 用于显示输入提示                                                                                     |
+| style           | 用于设置筛选项样式                                                                                   |
+| search_by_style | 用于设置筛选项搜索的样式                                                                             |
+
+#### Daterange设置例子
+
+使用`iview-datapicker`时，时间段使用数组表示
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "daterange", type: "Daterange", placeholder: "反馈时间" },
+            ]
+        })
+    ]
+    ...
+}
+```
+
+由于部分接口设计需分拆成两个字段，以下配置能满足需要。
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "start", type: Date, hidden: true },
+                { name: "end", type: Date, hidden: true },
+                { name: "daterange", type: "Daterange", subs: ['start','end'], placeholder: "反馈时间" },
+            ]
+        })
+    ]
+    ...
+}
+```
+
+#### Search设置例子
+
+为满足多个字符串方式的筛选只能使用一个时的需求，可使用以下设置。
+
+
+```js
+import { ConditionMixin } from 'vue-admin-mixins';
+export default {
+    mixins: [
+        ConditionMixin({
+            condition: [
+                { name: "connect", type: String, title: '联系方式', default: '', hidden: true },
+                { name: "user_id", type: String, title: '用户id', default: '', hidden: true },
+                { name: "search", type: "Search", subs: ['user_id','connect'], search_by: 'user_id' }
+            ]
+        })
+    ]
+    ...
+}
+```
+
 ## ModelMixin
 
 进行异步数据请求，传入模型必须带上`ModelName`字段，用于生成关联。
@@ -231,6 +304,60 @@ export default {
 </script>
 ```
 以`$$active`为公用数据请求函数，并提供请求前、请求成功与请求失败的处理函数以供灵活使用
+
+#### $$onRequestBefore钩子
+
+| 名称 | 参数 | 说明 |
+|------|------|
+| `$$onRequestBefore` | `modelName`类名, `method`方法名, `ctx`上下文内容 | 请求前处理，必须返回`ctx`上下文 |
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+|query|请求参数|
+|options={origin}|请求源|
+
+#### $$onRestfulError钩子
+
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 |
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+|err| 错误内容 |
+
+#### $$onRestfulSuccess钩子
+
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$onRestfulSuccess` | `modelName`类名, `method`方法名, `result`请求返回的内容 | 请求成功后的处理 |
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+|result|请求成功返回的信息|
+
+#### $$fetch方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$fetch` | `MODEL_NAME`类名, `query`请求参数, `options`设置 | 请求数据列表 |
+
+#### $$find方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$find` | `MODEL_NAME`类名, `id`请求对象ID, `options`设置 | 请求单个数据 |
+
+#### $$save方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$save` | `MODEL_NAME`类名, `data`请求保存对象, `options`设置 | 请求保存对象 |
+
+#### $$del方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$del` | `MODEL_NAME`类名, `id`请求对象ID, `options`设置 | 请求删除数据 |
 
 ## DirtyHandlerMixin
 
@@ -313,6 +440,54 @@ export default {
 }
 </script>
 ```
+#### $$onRestfulBefore钩子
+
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$onRestfulBefore` | `modelName`类名, `method`方法名 | 获得请求结果前的处理
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+| 无 | 无 |
+
+#### $$onRestfulSuccess钩子
+
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$onRestfulSuccess` | `modelName`类名, `method`方法名 | 成功获得请求结果后的处理
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+| 无 | 无 |
+
+#### $$onRestfulError钩子
+
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$onRestfulError` | `modelName`类名, `method`方法名, `err`错误内容 | 请求出错后的处理 |
+
+`ctx`上下文包含：
+| 名称 | 说明 |
+|-|-|
+|err| 错误内容 |
+
+#### $$refreshDetail方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$refreshDetail` |  `query`请求参数 | 刷新数据 |
+
+#### $$saveDetail方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$saveDetail` |  `data`请求参数对象 | 进行表单验证并调用$$save方法 |
+
+#### $$destroyDetail方法
+| 名称 | 参数 | 说明 |
+|-|-|-|
+| `$$destroyDetail` | - | 进行删除确认并调用$$del方法 |
+
 ## MessageMixin
 
 全局信息反馈
@@ -375,74 +550,3 @@ export default {
 |-------------|------------------|
 | vue-admin-mixins | StatusMixin |
 
-### 设置说明
-
-| 字段名称        | 说明                                                                                                 |
-|-----------------|----------------------------------------------------------------------------------------------------|
-| name            | 字段名称                                                                                             |
-| type            | 类型，`FilterBar`将会根据此字段改变显示方式，目前支持：`Date`, `Daterange`, `String`, `Array`, `Search` |
-| subs            | 当类型是`Daterang`或`Search`时有效，内容为筛选项中名称集                                              |
-| hidden          | 是否显示该筛选项                                                                                     |
-| options         | 当类型是`Array`时有效，内容为筛选可选项                                                               |
-| search_by       | 当类型是`Search`是有效，内容为筛选项中某项的名称                                                      |
-| clearable       | 当类型是`Array`是有效，用于`iview-select`                                                             |
-| placeholder     | 用于显示输入提示                                                                                     |
-| style           | 用于设置筛选项样式                                                                                   |
-| search_by_style | 用于设置筛选项搜索的样式                                                                             |
-
-#### Daterange设置例子
-
-使用`iview-datapicker`时，时间段使用数组表示
-
-```js
-import { ConditionMixin } from 'vue-admin-mixins';
-export default {
-    mixins: [
-        ConditionMixin({
-            condition: [
-                { name: "daterange", type: "Daterange", placeholder: "反馈时间" },
-            ]
-        })
-    ]
-    ...
-}
-```
-
-由于部分接口设计需分拆成两个字段，以下配置能满足需要。
-
-```js
-import { ConditionMixin } from 'vue-admin-mixins';
-export default {
-    mixins: [
-        ConditionMixin({
-            condition: [
-                { name: "start", type: Date, hidden: true },
-                { name: "end", type: Date, hidden: true },
-                { name: "daterange", type: "Daterange", subs: ['start','end'], placeholder: "反馈时间" },
-            ]
-        })
-    ]
-    ...
-}
-```
-
-#### Search设置例子
-
-为满足多个字符串方式的筛选只能使用一个时的需求，可使用以下设置。
-
-
-```js
-import { ConditionMixin } from 'vue-admin-mixins';
-export default {
-    mixins: [
-        ConditionMixin({
-            condition: [
-                { name: "connect", type: String, title: '联系方式', default: '', hidden: true },
-                { name: "user_id", type: String, title: '用户id', default: '', hidden: true },
-                { name: "search", type: "Search", subs: ['user_id','connect'], search_by: 'user_id' }
-            ]
-        })
-    ]
-    ...
-}
-```
